@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+
+let cities = [];
+
+  $.ajax({
+    url:endpoint
+  }).done(function (res) {
+  
+    cities = JSON.parse(res);
+
+  })
+
+
+  document.querySelector('.search').addEventListener('keyup',function () {
+
+    let filter = this.value.trim();
+
+    let regexp = new RegExp(filter, 'gi')
+
+    let filterArray = cities.filter(function (City) {
+
+      return City.city.match(regexp) || City.state.match(regexp);
+
+    });
+
+    let html = filterArray.map(function (City) {
+
+      let cityName = City.city.replace(regexp, `<span class="h1">${filter}</span>`)
+
+      let stateName = City.state.replace(regexp,`<span class="h1">${filter}</span>`)
+
+      return `
+        <li>
+          <span class="name">${cityName}, ${stateName}</span>
+          <span class="polpulation">${(City.population * 1).toLocaleString()}</span>
+           
+        </li>
+        `;
+
+    }).join('')
+
+    document.querySelector('.suggestions').innerHTML = html;
+
+  });
+
+</script>
+</body>
+</html>
